@@ -1,0 +1,20 @@
+[package]
+name = "agents-sync"
+version = "0.1.0"
+edition = "2021"
+description = "One manifest for every coding agent: shares instructions, skills, subagents, hooks and MCP servers across Claude Code, Codex, Copilot, Qoder and Cursor."
+publish = false
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive", "env"] }
+glob = "0.3"
+humantime = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+similar = "2"
+toml = "0.8"
+toml_edit = "0.22"
+
+[dev-dependencies]
+tempfile = "3"

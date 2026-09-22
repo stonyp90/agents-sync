@@ -1,0 +1,55 @@
+# Example manifest: copy to ~/.agents/agents.toml and adapt.
+# Edit, then:  agents-sync plan   (dry run)   ·   agents-sync sync   (apply, with backups)
+# Relative paths resolve against this file's folder.
+version = 1
+
+[instructions]
+# Linked as ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/.qoder/AGENTS.md,
+# ~/.copilot/copilot-instructions.md.
+source = "AGENTS.md"
+
+[skills]
+# Codex and Copilot read ~/.agents/skills natively; Claude, Qoder and Cursor get links.
+dir = "skills"
+# Glob patterns kept out of the tools that need links.
+exclude = ["experimental-*"]
+
+[agents]
+# Markdown subagents: linked for Claude, Copilot, Qoder, Cursor; converted to TOML for Codex.
+dir = "agents"
+
+# Hooks use Claude event names and are translated per tool. Events a tool
+# lacks are skipped with a warning. `skip` leaves a tool out.
+[[hooks]]
+event = "PreToolUse"
+matcher = "Bash"
+command = "~/bin/guard-shell.sh"
+timeout = 10
+
+[[hooks]]
+event = "SessionStart"
+command = "~/.cargo/bin/agents-sync check --hook"
+
+# MCP servers. `keychain:<service>` and `env:<VAR>` values are resolved by
+# `agents-sync exec-mcp` at launch and never written into a tool's config.
+[mcp.github]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+env = { GITHUB_PERSONAL_ACCESS_TOKEN = "keychain:agents-sync.github" }
+
+[mcp.notion]
+url = "https://mcp.notion.com/mcp"
+skip = ["claude"]
+
+# Tools kept in sync. A tool without a table (or with enabled = false) is left alone.
+# `home` and `mcp_file` override where a tool keeps its files.
+[targets.claude]
+[targets.codex]
+[targets.copilot]
+[targets.qoder]
+[targets.cursor]
+# enabled = false
+
+# [watch]
+# label = "io.github.agents-sync"
+# throttle_seconds = 2
